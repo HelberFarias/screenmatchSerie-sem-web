@@ -18,34 +18,81 @@ public class Principal {
     private ConsumoApi consumo = new ConsumoApi();
     private ConverteDados conversor = new ConverteDados();
     Scanner input = new Scanner(System.in);
-    List<DadosTemporada> temporadas = new ArrayList<>();
+    private List<DadosSerie> dadosSeries = new ArrayList<>();
+
 
     public void exibeMenu() {
-        System.out.println("Digite o nome da serie: ");
+        int opcao = -1;
+        while (opcao != 0) {
+            var menu = """
+                    1 - Buscar séries
+                    2 - Buscar episódios
+                    3 - Listar series buscadas
+                    
+                    0 - Sair                                 
+                    """;
+
+            System.out.println(menu);
+            opcao = input.nextInt();
+            input.nextLine();
+
+            switch (opcao) {
+                case 1:
+                    buscarSerieWeb();
+                    break;
+                case 2:
+                    buscarEpisodioPorSerie();
+                    break;
+                case 3:
+                    listarSeriesBuscadas();
+                    break;
+                case 0:
+                    System.out.println("Saindo...");
+                    break;
+                default:
+                    System.out.println("Opção inválida");
+            }
+        }
+    }
+
+    private void listarSeriesBuscadas() {
+        dadosSeries.forEach(System.out::println);
+    }
+
+    private void buscarSerieWeb() {
+        DadosSerie dados = getDadosSerie();
+        dadosSeries.add(dados);
+        System.out.println(dados);
+    }
+
+    private DadosSerie getDadosSerie() {
+        System.out.println("Digite o nome da série para busca");
         var nomeSerie = input.nextLine();
         var json = consumo.obterDados(ENDERECO + nomeSerie.replace(" ", "+") + API_KEY);
         DadosSerie dados = conversor.obterDados(json, DadosSerie.class);
-        System.out.println(dados);
-        for (int i = 1; i <= dados.totalTemporada(); i++) {
-            json = consumo.obterDados(ENDERECO +
-                    nomeSerie.replace(" ", "+") +
-                    "&season=" +
-                    i +
-                    API_KEY);
+        return dados;
+    }
+
+    private void buscarEpisodioPorSerie(){
+        DadosSerie dadosSerie = getDadosSerie();
+        List<DadosTemporada> temporadas = new ArrayList<>();
+
+        for (int i = 1; i <= dadosSerie.totalTemporada(); i++) {
+            var json = consumo.obterDados(ENDERECO + dadosSerie.titulo().replace(" ", "+") + API_KEY);
             DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
             temporadas.add(dadosTemporada);
         }
-//        temporadas.forEach(System.out::println);
-//        for (int i = 0; i <= dados.totalTemporada(); i++) {
-//            List<DadosEpisodio> episodiosTemporadas = temporadas.get(i).episodios();
-//                for (int j = 0; j <= episodiosTemporadas.size(); j++) {
-//                    System.out.println(episodiosTemporadas.get(j).titulo());
-//            }
-//        }
-        temporadas.forEach(t -> t.episodios());
-        List<DadosEpisodio> dadosEpisodios = temporadas.stream()
-                .flatMap(t -> t.episodios().stream())
-                .collect(Collectors.toList());
+        temporadas.forEach(System.out::println);
+
+
+
+
+
+
+//        temporadas.forEach(t -> t.episodios());
+//        List<DadosEpisodio> dadosEpisodios = temporadas.stream()
+//                .flatMap(t -> t.episodios().stream())
+//                .collect(Collectors.toList());
 
 
         // Estudo do Peek
@@ -63,10 +110,10 @@ public class Principal {
 //                .peek(e -> System.out.println("Mapeamento" + e))
 //                .forEach(System.out::println);
 
-        List<Episodio> episodios = temporadas.stream()
-                .flatMap(t -> t.episodios().stream()
-                        .map(d -> new Episodio(t.numero(), d)))
-                .collect(Collectors.toList());
+//        List<Episodio> episodios = temporadas.stream()
+//                .flatMap(t -> t.episodios().stream()
+//                        .map(d -> new Episodio(t.numero(), d)))
+//                .collect(Collectors.toList());
         //episodios.forEach(System.out::println);
 
         // Encontrando a primeira ocorrencia .findFirst
@@ -90,27 +137,23 @@ public class Principal {
         // Estudo do MAP
         // Estrutura AGRUPAMENTO de dados que necessita de uma chave e um valor
 
-        Map<Integer, Double> avaliacaoPorTemporada = episodios.stream()
-                .filter(e -> e.getAvalicao() > 0.0)
-                .collect(Collectors.groupingBy(e -> e.getTemporada(),
-                         Collectors.averagingDouble(e -> e.getAvalicao())));
-        System.out.println(avaliacaoPorTemporada);
+//        Map<Integer, Double> avaliacaoPorTemporada = episodios.stream()
+//                .filter(e -> e.getAvalicao() > 0.0)
+//                .collect(Collectors.groupingBy(e -> e.getTemporada(),
+//                         Collectors.averagingDouble(e -> e.getAvalicao())));
+//        System.out.println(avaliacaoPorTemporada);
 
 
         // Coletando estatisticas
         // Uso do DoubleSummaryStatistics
 
-        DoubleSummaryStatistics est = episodios.stream()
-                .filter(e -> e.getAvalicao() > 0.0)
-                .collect(Collectors.summarizingDouble(e -> e.getAvalicao()));
-        System.out.println("Media: " + est.getAverage());
-        System.out.println("Melhor avaliação: " + est.getMax());
-        System.out.println("Pior avaliação: " + est.getMin());
-        System.out.println("Quantidade avaliados: " + est.getCount());
-
-
-
-
+//        DoubleSummaryStatistics est = episodios.stream()
+//                .filter(e -> e.getAvalicao() > 0.0)
+//                .collect(Collectors.summarizingDouble(e -> e.getAvalicao()));
+//        System.out.println("Media: " + est.getAverage());
+//        System.out.println("Melhor avaliação: " + est.getMax());
+//        System.out.println("Pior avaliação: " + est.getMin());
+//        System.out.println("Quantidade avaliados: " + est.getCount());
 
 
 
@@ -127,15 +170,6 @@ public class Principal {
 //                                "Episodio: " + e.getTitulo() +
 //                                "Data de Lançamento: " + e.getDataLacamento().format(formatador)
 //                ));
-
-
-
-
-
-
-
-
-
 
 //        List<String> nomes = Arrays.asList("Helber", "Helena", "Junyo", "Gomes", "Farias");
 //        nomes.stream()
