@@ -1,5 +1,7 @@
 package br.com.alura.screenmatchserie.model;
 
+import br.com.alura.screenmatchserie.service.ConsultaMyMemory;
+
 import java.util.OptionalDouble;
 
 public class Serie {
@@ -18,7 +20,7 @@ public class Serie {
         this.genero = Categoria.fromString(dadosSerie.genero().split(",")[0].trim()); //split pra transformar em lista e pegar o primeiro elemento, primeiro genero [0] e o trim pra tirar os espaços
         this.atores = dadosSerie.atores();
         this.poster = dadosSerie.poster();
-        this.sinopse = dadosSerie.sinopse();
+        this.sinopse = ConsultaMyMemory.obterTraducao(dadosSerie.sinopse());
 
 
     }
