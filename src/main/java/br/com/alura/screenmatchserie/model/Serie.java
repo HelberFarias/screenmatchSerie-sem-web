@@ -1,10 +1,16 @@
 package br.com.alura.screenmatchserie.model;
 
 import br.com.alura.screenmatchserie.service.ConsultaMyMemory;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 import java.util.OptionalDouble;
 
+@Entity
+@Table(name = "series")
 public class Serie {
+    
     private  String titulo;
     private  Integer totalTemporada;
     private Double avaliacao;
@@ -13,7 +19,7 @@ public class Serie {
     private String poster;
     private String sinopse;
 
-    public Serie (DadosSerie dadosSerie){
+    public Serie (DadosSerie dadosSerie) {
         this.titulo = dadosSerie.titulo();
         this.totalTemporada = dadosSerie.totalTemporada();
         this.avaliacao = OptionalDouble.of(Double.valueOf(dadosSerie.avaliacao())).orElse(0.0);
