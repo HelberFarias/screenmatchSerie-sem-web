@@ -25,6 +25,8 @@ public class Serie {
     @Transient
     private List<Episodio> episodios = new ArrayList<>();
 
+    public Serie () {} //esse construtor foi feito pq é exigencia da JPA
+
     public Serie (DadosSerie dadosSerie) {
         this.titulo = dadosSerie.titulo();
         this.totalTemporada = dadosSerie.totalTemporada();
