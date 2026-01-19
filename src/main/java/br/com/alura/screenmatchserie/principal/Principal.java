@@ -18,11 +18,11 @@ public class Principal {
     private ConverteDados conversor = new ConverteDados();
     private List<DadosSerie> dadosSeries = new ArrayList<>();
     private SerieRepository repositorio;
+    private List<Serie> series = new ArrayList<>();
 
     public Principal(SerieRepository repositorio) {
         this.repositorio = repositorio;
     }
-
 
     public void exibeMenu() {
         int opcao = -1;
@@ -59,7 +59,7 @@ public class Principal {
     }
 
     private void listarSeriesBuscadas() {
-        List<Serie> series = repositorio.findAll();
+        series = repositorio.findAll();
 //        series = dadosSeries.stream()
 //                .map(d -> new Serie(d))
 //                .collect(Collectors.toList());
@@ -68,7 +68,7 @@ public class Principal {
                 .forEach(System.out::println);
     }
 
-    private void buscarSerieWeb() {
+    private void    buscarSerieWeb() {
         DadosSerie dados = getDadosSerie();
         Serie serie = new Serie(dados);
         //dadosSeries.add(dados);
@@ -85,15 +85,40 @@ public class Principal {
     }
 
     private void buscarEpisodioPorSerie(){
-        DadosSerie dadosSerie = getDadosSerie();
-        List<DadosTemporada> temporadas = new ArrayList<>();
+        //DadosSerie dadosSerie = getDadosSerie(); aplicação começou assim, mas mudamos pra buscar os EPs no banco de dados
+        listarSeriesBuscadas();
+        System.out.println("Escolha uma série pelo nome: ");
+        var nomeSerie = input.nextLine();
+        Optional<Serie> serie = series.stream()
+                .filter(s -> s.getTitulo().toLowerCase().contains(nomeSerie.toLowerCase()))
+                .findFirst();
 
-        for (int i = 1; i <= dadosSerie.totalTemporada(); i++) {
-            var json = consumo.obterDados(ENDERECO + dadosSerie.titulo().replace(" ", "+") + API_KEY);
-            DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
-            temporadas.add(dadosTemporada);
+        if (serie.isPresent()) {
+            var serieEncontrada = serie.get(); //referencia de pegar a serie para uma variavel (facilitar o código)
+            List<DadosTemporada> temporadas = new ArrayList<>();
+
+            for (int i = 1; i <= serieEncontrada.getTotalTemporada(); i++) {
+                var json = consumo.obterDados(
+                        ENDERECO
+                                + serieEncontrada.getTitulo().replace(" ", "+")
+                                + "&season="
+                                + i
+                                + API_KEY);
+                DadosTemporada dadosTemporada = conversor.obterDados(json, DadosTemporada.class);
+                temporadas.add(dadosTemporada);
+            }
+            temporadas.forEach(System.out::println);
+            List<Episodio> episodios = temporadas.stream()
+                    .flatMap(d -> d.episodios().stream()
+                            .map(e -> new Episodio(d.numero(), e)))
+                    .collect(Collectors.toList());
+            serieEncontrada.setEpisodios(episodios);
+            repositorio.save(serieEncontrada);
+        } else {
+            System.out.println("Episodio não encontrado!");
         }
-        temporadas.forEach(System.out::println);
+
+
 
 
 
@@ -128,7 +153,7 @@ public class Principal {
         //episodios.forEach(System.out::println);
 
         // Encontrando a primeira ocorrencia .findFirst
-        // .findFirst não tem um retorno especifico e por isso, é bom guarda-lo em CONTAINER do tipo <Optional>
+        // .findFirst não tem um retorno especifico e por isso, deve guarda-lo em CONTAINER do tipo <Optional>
         // Esse container é especial e sua caracteristica especial é a possibilidade dele ter ou não um conteudo dentro
         // Metodo usado para buscar episodio por nome ou trecho do nome (titulo episodio).
         // Optional não é uma barra de busca, mas sim o resultado consciente da busca

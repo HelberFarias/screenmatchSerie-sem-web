@@ -23,7 +23,8 @@ public class Serie {
     private String poster;
     private String sinopse;
     //@Transient anotação que informa pra JPA que não precisa se impotar como essa entidade ainda
-    @OneToMany (mappedBy = "serie") //precisar indicar qual atributo da outra classe que será mapeado
+    @OneToMany (mappedBy = "serie", cascade = CascadeType.ALL)
+    //precisar indicar qual atributo da outra classe que será mapeado e o cascade serve para indicar que queremos salvar os episodios
     private List<Episodio> episodios = new ArrayList<>();
 
     public Serie () {} //esse construtor foi feito pq é exigencia da JPA
@@ -36,8 +37,6 @@ public class Serie {
         this.atores = dadosSerie.atores();
         this.poster = dadosSerie.poster();
         this.sinopse = ConsultaMyMemory.obterTraducao(dadosSerie.sinopse());
-
-
     }
 
     public List<Episodio> getEpisodios() {
@@ -115,8 +114,8 @@ public class Serie {
     @Override
     public String toString() {
         return
-                "genero= " + genero +
-                ", titulo= '" + titulo + '\'' +
+                "titulo= '" + titulo + '\'' +
+                ", genero= " + genero +
                 ", totalTemporada= " + totalTemporada +
                 ", avaliacao= " + avaliacao +
                 ", atores= '" + atores + '\'' +
