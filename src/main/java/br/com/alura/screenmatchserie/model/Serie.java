@@ -22,7 +22,8 @@ public class Serie {
     private String atores;
     private String poster;
     private String sinopse;
-    @Transient
+    //@Transient anotação que informa pra JPA que não precisa se impotar como essa entidade ainda
+    @OneToMany (mappedBy = "serie") //precisar indicar qual atributo da outra classe que será mapeado
     private List<Episodio> episodios = new ArrayList<>();
 
     public Serie () {} //esse construtor foi feito pq é exigencia da JPA
