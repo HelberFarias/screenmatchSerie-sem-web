@@ -23,9 +23,11 @@ public class Serie {
     private String poster;
     private String sinopse;
     //@Transient anotação que informa pra JPA que não precisa se impotar como essa entidade ainda
-    @OneToMany (mappedBy = "serie", cascade = CascadeType.ALL)
-    //precisar indicar qual atributo da outra classe que será mapeado e o cascade serve para indicar que queremos salvar os episodios
+    @OneToMany (mappedBy = "serie", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Episodio> episodios = new ArrayList<>();
+    //@OneToMany = precisar indicar qual atributo da outra classe que será mapeado e o cascade serve para indicar que queremos salvar os episodios
+    //cascade = CascadeType (traga em cascata o que estar dentro da Serie que é agrgregate root
+    //fetch = FetchType.EAGER ( JPA: “quando eu carregar essa entidade, traga essa relação junto imediatamente, sem lazy)
 
     public Serie () {} //esse construtor foi feito pq é exigencia da JPA
 
@@ -44,6 +46,7 @@ public class Serie {
     }
 
     public void setEpisodios(List<Episodio> episodios) {
+        episodios.forEach(e -> e.setSerie(this));
         this.episodios = episodios;
     }
 
@@ -121,6 +124,7 @@ public class Serie {
                 ", atores= '" + atores + '\'' +
                 ", poster= '" + poster + '\'' +
                 ", sinopse= '" + sinopse + '\'' +
+                ", episodio: " + episodios + '\'' +
                 '}';
     }
 }

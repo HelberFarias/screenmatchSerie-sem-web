@@ -4,8 +4,7 @@ import br.com.alura.screenmatchserie.model.*;
 import br.com.alura.screenmatchserie.repository.SerieRepository;
 import br.com.alura.screenmatchserie.service.ConsumoApi;
 import br.com.alura.screenmatchserie.service.ConverteDados;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,7 +29,11 @@ public class Principal {
             var menu = """
                     1 - Buscar séries
                     2 - Buscar episódios
-                    3 - Listar series buscadas
+                    3 - Listar séries buscadas
+                    4 - Buscar série por titulo
+                    5 - Buscar série por ator
+                    6 - Top 5 séries
+                    7 - Buscar por categória
                     
                     0 - Sair                                 
                     """;
@@ -48,6 +51,21 @@ public class Principal {
                     break;
                 case 3:
                     listarSeriesBuscadas();
+                    break;
+                case 4:
+                    buscarSeriePortitulo();
+                    break;
+                case 5:
+                    buscarSeriePorAtor();
+                    break;
+                case 6:
+                    buscarTop5Series();
+                    break;
+                case 7:
+                    buscarSeriesPorCategoria();
+                    break;
+                case 8:
+                    buscaPersonalizada();
                     break;
                 case 0:
                     System.out.println("Saindo...");
@@ -68,7 +86,7 @@ public class Principal {
                 .forEach(System.out::println);
     }
 
-    private void    buscarSerieWeb() {
+    private void buscarSerieWeb() {
         DadosSerie dados = getDadosSerie();
         Serie serie = new Serie(dados);
         //dadosSeries.add(dados);
@@ -89,9 +107,7 @@ public class Principal {
         listarSeriesBuscadas();
         System.out.println("Escolha uma série pelo nome: ");
         var nomeSerie = input.nextLine();
-        Optional<Serie> serie = series.stream()
-                .filter(s -> s.getTitulo().toLowerCase().contains(nomeSerie.toLowerCase()))
-                .findFirst();
+        Optional<Serie> serie = repositorio.findByTituloContainingIgnoreCase(nomeSerie);
 
         if (serie.isPresent()) {
             var serieEncontrada = serie.get(); //referencia de pegar a serie para uma variavel (facilitar o código)
@@ -117,13 +133,58 @@ public class Principal {
         } else {
             System.out.println("Episodio não encontrado!");
         }
+    }
+
+    private void buscarSeriePortitulo() {
+        System.out.println("Escolha uma série pelo nome: ");
+        var nomeSerie = input.nextLine();
+        Optional <Serie> buscaSerie = repositorio.findByTituloContainingIgnoreCase(nomeSerie);
+        if (buscaSerie.isPresent()) {
+            System.out.println("Serie encontrada: " + buscaSerie.get());
+        } else {
+            System.out.println("Serie não encontrada!");
+        }
+    }
+
+    private void buscarSeriePorAtor() {
+        System.out.println("Digite o nome do ator (a): ");
+        var nomeAtor = input.nextLine();
+        System.out.println("Avaliações a partir de que valor: ");
+        var avaliacao = input.nextDouble();
+        List<Serie> seriesEncontradas = repositorio.findByAtoresContainingIgnoreCaseAndAvaliacaoGreaterThanEqual(nomeAtor, avaliacao);
+        System.out.println("Series em que o Ator " + nomeAtor + " trabalhou!");
+        seriesEncontradas.forEach(s ->
+                System.out.println(s.getTitulo() + "avaliação " + s.getAvaliacao()));
+    }
+
+    private void buscarTop5Series() {
+        List<Serie> seriesTop = repositorio.findTop5ByOrderByAvaliacaoDesc();
+        seriesTop.forEach(s ->
+                System.out.println("Série: " + s.getTitulo() + " avaliação: " + s.getAvaliacao()));
+    }
+
+    private void buscarSeriesPorCategoria() {
+        System.out.println("Buscar por categoria/gênero: ");
+        var nomeGenero = input.nextLine();
+        Categoria categoria = Categoria.fromPortugues(nomeGenero);
+        List<Serie> serieCategoria = repositorio.findByGenero(categoria);
+        System.out.println("Séries da categoria: " + serieCategoria);
+        serieCategoria.forEach(System.out::println);
+
+    }
+
+    private void buscaPersonalizada() {
+        System.out.println("Digite o máximo de temporada desejada: ");
+        var totalTemporada = input.nextInt();
+        System.out.println("Digite a avaliação minima: ");
+        var avaliacaoMinima = input.nextDouble();
+        List<Serie> buscaPersonalizada = repositorio.findByTotalTemporadaLessThanAndAvaliacaoGreaterThanEqual(totalTemporada, avaliacaoMinima);
+        buscaPersonalizada.forEach(System.out::println);
+    }
+}
 
 
-
-
-
-
-
+//  ----------------- ConteudoEstudo -----------------  //
 
 //        temporadas.forEach(t -> t.episodios());
 //        List<DadosEpisodio> dadosEpisodios = temporadas.stream()
@@ -131,8 +192,8 @@ public class Principal {
 //                .collect(Collectors.toList());
 
 
-        // Estudo do Peek
-        // Função usada para acompanhar cada fluxo do stream() e ter melhor controle sobre
+// Estudo do Peek
+// Função usada para acompanhar cada fluxo do stream() e ter melhor controle sobre
 
 //        System.out.println("\nTop 10 Episodios");
 //        dadosEpisodios.stream()
@@ -150,13 +211,13 @@ public class Principal {
 //                .flatMap(t -> t.episodios().stream()
 //                        .map(d -> new Episodio(t.numero(), d)))
 //                .collect(Collectors.toList());
-        //episodios.forEach(System.out::println);
+//episodios.forEach(System.out::println);
 
-        // Encontrando a primeira ocorrencia .findFirst
-        // .findFirst não tem um retorno especifico e por isso, deve guarda-lo em CONTAINER do tipo <Optional>
-        // Esse container é especial e sua caracteristica especial é a possibilidade dele ter ou não um conteudo dentro
-        // Metodo usado para buscar episodio por nome ou trecho do nome (titulo episodio).
-        // Optional não é uma barra de busca, mas sim o resultado consciente da busca
+// Encontrando a primeira ocorrencia .findFirst
+// .findFirst não tem um retorno especifico e por isso, deve guarda-lo em CONTAINER do tipo <Optional>
+// Esse container é especial e sua caracteristica especial é a possibilidade dele ter ou não um conteudo dentro
+// Metodo usado para buscar episodio por nome ou trecho do nome (titulo episodio).
+// Optional não é uma barra de busca, mas sim o resultado consciente da busca
 
 //        System.out.println("Digite o nome do titulo: ");
 //        var trechoTitulo = input.nextLine();
@@ -170,8 +231,8 @@ public class Principal {
 //            System.out.println("Episodio não encontrado!");
 //        }
 
-        // Estudo do MAP
-        // Estrutura AGRUPAMENTO de dados que necessita de uma chave e um valor
+// Estudo do MAP
+// Estrutura AGRUPAMENTO de dados que necessita de uma chave e um valor
 
 //        Map<Integer, Double> avaliacaoPorTemporada = episodios.stream()
 //                .filter(e -> e.getAvalicao() > 0.0)
@@ -180,8 +241,8 @@ public class Principal {
 //        System.out.println(avaliacaoPorTemporada);
 
 
-        // Coletando estatisticas
-        // Uso do DoubleSummaryStatistics
+// Coletando estatisticas
+// Uso do DoubleSummaryStatistics
 
 //        DoubleSummaryStatistics est = episodios.stream()
 //                .filter(e -> e.getAvalicao() > 0.0)
@@ -215,7 +276,6 @@ public class Principal {
 //                .map(n -> n.toUpperCase())
 //                .forEach(System.out::println); //operacao final
 //
-//        //OPERACAO INTERMEDIARIA: gera um novo fluxo de dado e possibilitou fazer outra ação nesse fluxo
-//        //OPERACAO FINAL: operações que finalizam o stream() (ex acima.: forEach)
-    }
-}
+//      OPERACAO INTERMEDIARIA: gera um novo fluxo de dado e possibilitou fazer outra ação nesse fluxo
+//      OPERACAO FINAL: operações que finalizam o stream() (ex acima.: forEach)
+//
