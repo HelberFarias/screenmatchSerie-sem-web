@@ -4,10 +4,8 @@ import br.com.alura.screenmatchserie.model.*;
 import br.com.alura.screenmatchserie.repository.SerieRepository;
 import br.com.alura.screenmatchserie.service.ConsumoApi;
 import br.com.alura.screenmatchserie.service.ConverteDados;
-
 import java.util.*;
 import java.util.stream.Collectors;
-
 
 public class Principal {
     Scanner input = new Scanner(System.in);
@@ -34,6 +32,7 @@ public class Principal {
                     5 - Buscar série por ator
                     6 - Top 5 séries
                     7 - Buscar por categória
+                    8 - Busca personalizada
                     
                     0 - Sair                                 
                     """;
@@ -177,8 +176,8 @@ public class Principal {
         System.out.println("Digite o máximo de temporada desejada: ");
         var totalTemporada = input.nextInt();
         System.out.println("Digite a avaliação minima: ");
-        var avaliacaoMinima = input.nextDouble();
-        List<Serie> buscaPersonalizada = repositorio.findByTotalTemporadaLessThanAndAvaliacaoGreaterThanEqual(totalTemporada, avaliacaoMinima);
+        var avaliacao = input.nextDouble();
+        List<Serie> buscaPersonalizada = repositorio.seriesPorTemporadaEAvaliacao(totalTemporada, avaliacao);
         buscaPersonalizada.forEach(System.out::println);
     }
 }

@@ -3,6 +3,7 @@ package br.com.alura.screenmatchserie.repository;
 import br.com.alura.screenmatchserie.model.Categoria;
 import br.com.alura.screenmatchserie.model.Serie;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,8 +17,14 @@ public interface SerieRepository extends JpaRepository<Serie, Long> {
 
     List<Serie> findByGenero(Categoria categoria);
 
-    List<Serie> findByTotalTemporadaLessThanAndAvaliacaoGreaterThanEqual(Integer totalTemporada, Double avaliacao);
+    //List<Serie> findByTotalTemporadaLessThanEqualAndAvaliacaoGreaterThanEqual(Integer totalTemporada, Double avaliacao);
 
+    @Query ("""
+            select s 
+            from Serie s 
+            WHERE s.totalTemporada <= :totalTemporada
+            AND s.avaliacao >= :avaliacao
+            """) // ":" significa parametro
+    List<Serie> seriesPorTemporadaEAvaliacao(Integer totalTemporada, Double avaliacao);
 
-    // número maximo de temporada e avaliação acima de 8
 }

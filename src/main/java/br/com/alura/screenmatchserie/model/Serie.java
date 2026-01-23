@@ -22,7 +22,7 @@ public class Serie {
     private String atores;
     private String poster;
     private String sinopse;
-    //@Transient anotação que informa pra JPA que não precisa se impotar como essa entidade ainda
+    //@Transient anotação que informa pra JPA que não precisa se importar como essa entidade ainda
     @OneToMany (mappedBy = "serie", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Episodio> episodios = new ArrayList<>();
     //@OneToMany = precisar indicar qual atributo da outra classe que será mapeado e o cascade serve para indicar que queremos salvar os episodios
