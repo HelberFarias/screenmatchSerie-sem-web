@@ -14,8 +14,8 @@ public class Episodio {
     private Integer temporada;
     private String titulo;
     private Integer numeroEpisodio;
-    private double avalicao;
-    private LocalDate dataLacamento;
+    private double avaliacao;
+    private LocalDate dataLancamento;
     @ManyToOne
     private Serie serie;
 
@@ -27,14 +27,14 @@ public class Episodio {
         this.numeroEpisodio = dadosEpisodio.episodio();
 
         try {
-            this.avalicao = Double.valueOf(dadosEpisodio.avaliacao());
+            this.avaliacao = Double.valueOf(dadosEpisodio.avaliacao());
         } catch (NumberFormatException e) {
-            this.avalicao = 0;
+            this.avaliacao = 0;
         }
         try {
-            this.dataLacamento = LocalDate.parse(dadosEpisodio.dataLancamento());
+            this.dataLancamento = LocalDate.parse(dadosEpisodio.dataLancamento());
         } catch (DateTimeParseException e) {
-            this.dataLacamento = null;
+            this.dataLancamento = null;
         }
 
 }
@@ -79,29 +79,29 @@ public class Episodio {
         this.numeroEpisodio = numeroEpisodio;
     }
 
-    public double getAvalicao() {
-        return avalicao;
+    public double getAvaliacao() {
+        return avaliacao;
     }
 
-    public void setAvalicao(double avalicao) {
-        this.avalicao = avalicao;
+    public void setAvaliacao(double avaliacao) {
+        this.avaliacao = avaliacao;
     }
 
-    public LocalDate getDataLacamento() {
-        return dataLacamento;
+    public LocalDate getDataLancamento() {
+        return dataLancamento;
     }
 
-    public void setDataLacamento(LocalDate dataLacamento) {
-        this.dataLacamento = dataLacamento;
+    public void setDataLancamento(LocalDate dataLancamento) {
+        this.dataLancamento = dataLancamento;
     }
 
     @Override
     public String toString() {
         return  "temporada= " + temporada +
                 ", titulo='" + titulo + '\'' +
-                ", numeroEpisodio=" + numeroEpisodio +
-                ", avalicao=" + avalicao +
-                ", dataLacamento=" + dataLacamento
+                ", numero do episodio=" + numeroEpisodio +
+                ", avaliacao=" + avaliacao +
+                ", data de lancamento=" + dataLancamento
                 ;
     }
 }
