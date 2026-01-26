@@ -12,20 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootApplication
-public class ScreenmatchserieApplication implements CommandLineRunner {
+public class ScreenmatchserieApplication  {
 
-    @Autowired //injeção de dependencia
-    private SerieRepository repositorio;
-
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 		SpringApplication.run(ScreenmatchserieApplication.class, args);
 	}
 
-    @Override
-    public void run(String... args) throws Exception {
 
-        Principal principal = new Principal(repositorio);
-        principal.exibeMenu();
-
-   }
 }
