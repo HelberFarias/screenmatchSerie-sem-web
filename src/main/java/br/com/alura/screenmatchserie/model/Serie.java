@@ -2,7 +2,6 @@ package br.com.alura.screenmatchserie.model;
 
 import br.com.alura.screenmatchserie.service.ConsultaMyMemory;
 import jakarta.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
