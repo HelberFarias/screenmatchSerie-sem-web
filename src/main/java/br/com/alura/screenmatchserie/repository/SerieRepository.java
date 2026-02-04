@@ -1,5 +1,6 @@
 package br.com.alura.screenmatchserie.repository;
 
+import br.com.alura.screenmatchserie.dto.EpisodioDTO;
 import br.com.alura.screenmatchserie.model.Categoria;
 import br.com.alura.screenmatchserie.model.Episodio;
 import br.com.alura.screenmatchserie.model.Serie;
@@ -73,4 +74,12 @@ public interface SerieRepository extends JpaRepository<Serie, Long> {
             """)
     List<Episodio> obterEpisodiosPorTemporada(Long id, Long numero);
 
+    @Query ("""
+            SELECT e
+            FROM Serie s
+            JOIN s.episodios e
+            WHERE s.id = :id 
+            ORDER BY e.avaliacao
+            """)
+    List<EpisodioDTO> obterTop5Episodios(Long id);
 }

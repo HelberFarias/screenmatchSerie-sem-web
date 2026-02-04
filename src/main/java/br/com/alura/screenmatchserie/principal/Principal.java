@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class Principal {
     Scanner input = new Scanner(System.in);
     private final String ENDERECO = "https://www.omdbapi.com/?t=";
-    private final String  API_KEY = "&apikey=d4a73045";
+    private final String API_KEY = "&apikey=d4a73045";
     private ConsumoApi consumo = new ConsumoApi();
     private ConverteDados conversor = new ConverteDados();
     private List<DadosSerie> dadosSeries = new ArrayList<>();
@@ -88,6 +88,14 @@ public class Principal {
         }
     }
 
+    private DadosSerie getDadosSerie() {
+        System.out.println("Digite o nome da série para busca");
+        var nomeSerie = input.nextLine();
+        var json = consumo.obterDados(ENDERECO + nomeSerie.replace(" ", "+") + API_KEY);
+        DadosSerie dados = conversor.obterDados(json, DadosSerie.class);
+        return dados;
+    }
+
     private void listarSeriesBuscadas() {
         series = repositorio.findAll();
 //        series = dadosSeries.stream()
@@ -104,14 +112,6 @@ public class Principal {
         //dadosSeries.add(dados);
         repositorio.save(serie);
         System.out.println(dados);
-    }
-
-    private DadosSerie getDadosSerie() {
-        System.out.println("Digite o nome da série para busca");
-        var nomeSerie = input.nextLine();
-        var json = consumo.obterDados(ENDERECO + nomeSerie.replace(" ", "+") + API_KEY);
-        DadosSerie dados = conversor.obterDados(json, DadosSerie.class);
-        return dados;
     }
 
     private void buscarEpisodioPorSerie(){
